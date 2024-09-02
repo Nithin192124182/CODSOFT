@@ -1,0 +1,66 @@
+import java.util.*;
+
+public class MovieRecommendationSystem {
+
+    public static void main(String[] args) {
+        Map<String, Map<String, Integer>> userRatings = new HashMap<>();
+        userRatings.put("User1", Map.of("MovieA", 5, "MovieB", 3, "MovieC", 4));
+        userRatings.put("User2", Map.of("MovieA", 4, "MovieB", 5, "MovieC", 2));
+        userRatings.put("User3", Map.of("MovieA", 2, "MovieB", 4, "MovieD", 5));
+
+        String targetUser = "User3";
+
+        List<String> recommendations = getRecommendations(userRatings, targetUser);
+
+        System.out.println("Recommendations for " + targetUser + ": " + recommendations);
+    }
+
+    private static List<String> getRecommendations(Map<String, Map<String, Integer>> userRatings, String targetUser) {
+        List<String> recommendations = new ArrayList<>();
+
+        Map<String, Double> userSimilarity = new HashMap<>();
+        for (String user : userRatings.keySet()) {
+            if (!user.equals(targetUser)) {
+                double similarity = calculateCosineSimilarity(userRatings.get(targetUser), userRatings.get(user));
+                userSimilarity.put(user, similarity);
+            }
+        }
+
+        List<Map.Entry<String, Double>> sortedUsers = new ArrayList<>(userSimilarity.entrySet());
+        sortedUsers.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+
+        for (Map.Entry<String, Double> entry : sortedUsers) {
+            String similarUser = entry.getKey();
+            for (String movie : userRatings.get(similarUser).keySet()) {
+                if (!userRatings.get(targetUser).containsKey(movie)) {
+                    recommendations.add(movie);
+                }
+            }
+        }
+
+        return recommendations;
+    }
+
+    private static double calculateCosineSimilarity(Map<String, Integer> user1, Map<String, Integer> user2) {
+        double dotProduct = 0.0;
+        double norm1 = 0.0;
+        double norm2 = 0.0;
+
+        for (String movie : user1.keySet()) {
+            if (user2.containsKey(movie)) {
+                dotProduct += user1.get(movie) * user2.get(movie);
+            }
+            norm1 += Math.pow(user1.get(movie), 2);
+        }
+
+        for (String movie : user2.keySet()) {
+            norm2 += Math.pow(user2.get(movie), 2);
+        }
+
+        if (norm1 == 0 || norm2 == 0) {
+            return 0.0;
+        }
+
+        return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
+    }
+}
