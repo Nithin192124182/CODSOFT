@@ -1,0 +1,38 @@
+import java.util.Scanner;
+import java.time.LocalTime;
+
+public class SimpleChatbot {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.print("You: ");
+            String userInput = scanner.nextLine().toLowerCase();
+
+            if (userInput.equals("exit") || userInput.equals("quit")) {
+                System.out.println("Chatbot: Goodbye!");
+                break;
+            }
+
+            String response = getChatbotResponse(userInput);
+            System.out.println("Chatbot: " + response);
+        }
+    }
+
+    public static String getChatbotResponse(String userInput) {
+        if (userInput.contains("hello") || userInput.contains("hi")) {
+            return "Hello! How can I help you today?";
+        } else if (userInput.contains("how are you")) {
+            return "I'm just a bot, but I'm doing well! How about you?";
+        } else if (userInput.contains("name")) {
+            return "I'm a simple chatbot created to demonstrate rule-based responses.";
+        } else if (userInput.contains("bye") || userInput.contains("goodbye")) {
+            return "Goodbye! Have a great day!";
+        } else if (userInput.contains("time")) {
+            LocalTime currentTime = LocalTime.now();
+            return "The current time is " + currentTime.getHour() + ":" + currentTime.getMinute() + ":" + currentTime.getSecond() + ".";
+        } else {
+            return "I'm sorry, I don't understand that. Can you please rephrase?";
+        }
+    }
+}
